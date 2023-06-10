@@ -1,8 +1,8 @@
 <?php
 
-namespace gdkf\gdkfSdk\unifiedPay;
+namespace gdkf\gdkfSdk;
 
-class UnifiedPayConfig
+class GdkfPayConfig
 {
 
     /**
@@ -11,9 +11,6 @@ class UnifiedPayConfig
      * 生产需要换生产商户，如果没有请联系广东快付的技术获取。
      */
     private $mchtCd;
-
-    //appid
-    private $appid;
 
     //网关地址
     private $reqUrl;
@@ -102,20 +99,6 @@ class UnifiedPayConfig
     public function setMchtCh($mchtch)
     {
         $this->mchtCd = $mchtch;
-    }
-    public function appid()
-    {
-        return $this->appid;
-    }
-
-    public function setAppid($appid)
-    {
-        $this->appid = $appid;
-    }
-
-    public function getAppid()
-    {
-        return $this->appid;
     }
 
     public function getMchtCd()

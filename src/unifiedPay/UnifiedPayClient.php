@@ -2,6 +2,8 @@
 
 namespace gdkf\gdkfSdk\unifiedPay;
 
+use gdkf\gdkfSdk\GdkfPayConfig;
+
 class UnifiedPayClient
 {
     public $mchtCd;
@@ -94,9 +96,8 @@ class UnifiedPayClient
 
    public function __construct()
    {
-       if(func_num_args()==1 && func_get_arg(0) instanceof UnifiedPayConfig){
+       if(func_num_args()==1 && func_get_arg(0) instanceof GdkfPayConfig){
            $payConfig=func_get_arg(0);
-           $this->appid=$payConfig->getAppid();
            $this->mchtCd=$payConfig->getMchtCd();
            $this->reqUrl=$payConfig->getReqUrl();
            $this->typeField=$payConfig->getTypeField();
@@ -107,8 +108,8 @@ class UnifiedPayClient
 
 
     public function reqPay($reqData){
-        //echo "=====>请求路径：" . KFRequestUtil::$reqUrl. "<br/>";
-        //echo "=====>请求参数：" . json_encode($reqData, JSON_UNESCAPED_UNICODE). "<br/>";
+        //获取校验参数
+        self::checkUnifiedPayContent($reqData);
         $encReqData = encrypt(json_encode($reqData), $this->secretKey);
         $data = [];
         $data["typeField"] = $this->typeField;
@@ -123,6 +124,29 @@ class UnifiedPayClient
         return $respStr;
     }
 
+
+    /**
+     * @param $arr
+     * @return true
+     * @throws \Exception
+     * 校验必传参数
+     */
+    private static function checkUnifiedPayContent($arr)
+    {
+        $filte = array_filter($arr);
+        $filteKey=array_keys($filte);
+        //定义必传参数
+        $key=['trscode','orgCd','mchtCd','outOrderId','transAmt','proCd','chanelType','outOrderTitle','notifyUrl','isSplitBill'];
+        //获取差集
+        $checkRes=array_diff($filteKey,$key);
+        if($checkRes){
+            foreach ($checkRes as $key =>$vel){
+                throw new \Exception(config('gdkf_error.'.$vel),0);
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 

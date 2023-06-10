@@ -3,11 +3,13 @@
 namespace gdkf\gdkfSdk\src\pay;
 
 use gdkf\gdkfSdk\unifiedPay\UnifiedPayClient;
-use gdkf\gdkfSdk\unifiedPay\UnifiedPayConfig;
+use gdkf\gdkfSdk\GdkfPayConfig;
+
 
 /**
- * 支付宝-微信支付
+ *统一下单接口
  */
+
 class UnifiedPayTrans
 {
 
@@ -17,12 +19,12 @@ class UnifiedPayTrans
 
     public function __construct()
     {
-        $this->unifiedPayConfig=new UnifiedPayConfig();
-        $this->unifiedPayConfig->setAppid("wx15ffc9d274ae60f1");
-        $this->unifiedPayConfig->setMchtCh("MCHT100011937");
-        $this->unifiedPayConfig->setOrgCd("201901176661391");
-        $this->unifiedPayConfig->setSecretKey("WJ6X1X6IRMO2EXZYLYWWZGMY");
-        $this->unifiedPayConfig->setTypeField("ORG");
+        $this->unifiedPayConfig=new GdkfPayConfig();
+        $this->unifiedPayConfig->setMchtCh(config('gdkf.config.mchtCd'));
+        $this->unifiedPayConfig->setOrgCd(config('gdkf.config.secretKey'));
+        $this->unifiedPayConfig->setSecretKey(config('gdkf.config.typeField'));
+        $this->unifiedPayConfig->setTypeField(config('gdkf.config.orgCd'));
+        $this->unifiedPayConfig->setReqUrl(config('gdkf.config.reqUrl'));
         $this->unifiedPayClient=new UnifiedPayClient($this->unifiedPayConfig);
     }
 
