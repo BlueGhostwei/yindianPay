@@ -1,0 +1,19 @@
+{
+    "name": "gdkf/gdkfpaysdk",
+    "description": "yindian-pay",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Gdkf\\Gdkfpaysdk\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "huangwei",
+            "email": "13226431320@163.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
