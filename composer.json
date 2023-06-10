@@ -1,6 +1,5 @@
 {
     "name": "gdkf/gdkfpaysdk",
-    "description": "yindian-pay",
     "type": "library",
     "license": "MIT",
     "autoload": {
