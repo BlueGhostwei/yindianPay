@@ -1,15 +1,14 @@
 <?php
 
-namespace gdkf\gdkfSdk\unifiedPay;
+namespace gdkf\gdkfSdk\payClient;
 
 use gdkf\gdkfSdk\GdkfPayConfig;
+use gdkf\gdkfSdk\service\HttpClientUtils;
+use gdkf\gdkfSdk\service\Des3Utils;
 
-class UnifiedPayClient
+class GdkfPayClient
 {
     public $mchtCd;
-
-    //appid
-    public $appid;
 
     /**
      * 网关地址
@@ -106,34 +105,39 @@ class UnifiedPayClient
        }
    }
 
-
-    public function reqPay($reqData){
+    public function reqPay($reqData)
+    {
+        $reqData['mchtCd']=$this->mchtCd;
+        $reqData['trscode']=$this->trscode;
+        $reqData['orgCd']=$this->orgCd;
+        $reqData['timestamp']= date("Y-m-d H:i:s");
         //获取校验参数
-        self::checkUnifiedPayContent($reqData);
-        $encReqData = encrypt(json_encode($reqData), $this->secretKey);
+        $this->checkEmpty($reqData);
+        ksort($reqData);
+        $encReqData = Des3Utils::encrypt(json_encode($reqData), $this->secretKey);//加密数据
         $data = [];
         $data["typeField"] = $this->typeField;
         $data["keyField"] = $this->orgCd;
         $data["dataField"] = $encReqData;
         //echo "=====>请求报文：" . json_encode($data). "<br/>";
-        $encRespStr = send_request($this->reqUrl, json_encode($data));
+        $encRespStr = HttpClientUtils::send_request($this->reqUrl, json_encode($data));
         //echo "=====>返回报文：" . $encRespStr . "<br/>";
         $respMsg = json_decode($encRespStr, true);
-        $respStr = decrypt($respMsg["dataField"], $this->secretKey);
+        $respStr = Des3Utils::decrypt($respMsg["dataField"], $this->secretKey);//解密数据
         //echo "=====>返回数据：" . $respStr . "<br/>";
         return $respStr;
     }
 
 
     /**
-     * @param $arr
+     * @param $reqData
      * @return true
      * @throws \Exception
      * 校验必传参数
      */
-    private static function checkUnifiedPayContent($arr)
+    public function checkEmpty($reqData)
     {
-        $filte = array_filter($arr);
+        $filte = array_filter($reqData);
         $filteKey=array_keys($filte);
         //定义必传参数
         $key=['trscode','orgCd','mchtCd','outOrderId','transAmt','proCd','chanelType','outOrderTitle','notifyUrl','isSplitBill'];
