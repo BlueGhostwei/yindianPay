@@ -8,6 +8,9 @@ use gdkf\gdkfSdk\service\Des3Utils;
 
 class GdkfPayClient
 {
+    /**
+     * 商户号
+     */
     public $mchtCd;
 
     /**
@@ -19,6 +22,12 @@ class GdkfPayClient
      * 秘钥类型域，机构秘钥:ORG、商户秘钥：MCHT、终端秘钥：TERM
      */
     public $typeField;
+
+    //获取到的字符编码
+    private $fileCharset = "UTF-8";
+
+    //提交的数据编码
+    private $postCharset = "UTF-8";
 
     /**
      * secretKey是3des加密秘钥，测试时请替换成自己的测试秘钥，
@@ -105,6 +114,11 @@ class GdkfPayClient
        }
    }
 
+    /**
+     * @param $reqData
+     * @return false|string
+     * @throws \Exception
+     */
     public function reqPay($reqData)
     {
         $reqData['mchtCd']=$this->mchtCd;
@@ -119,6 +133,10 @@ class GdkfPayClient
         $data["typeField"] = $this->typeField;
         $data["keyField"] = $this->orgCd;
         $data["dataField"] = $encReqData;
+        //转换字符集编码
+        foreach ($data as &$value){
+            $value=$this->characet($value,$this->postCharset);
+        }
         //echo "=====>请求报文：" . json_encode($data). "<br/>";
         $encRespStr = HttpClientUtils::send_request($this->reqUrl, json_encode($data));
         //echo "=====>返回报文：" . $encRespStr . "<br/>";
@@ -128,6 +146,31 @@ class GdkfPayClient
         return $respStr;
     }
 
+    /**
+     * @param $str
+     * @return void
+     * 获取字符编码
+     */
+    private function setupCharsets($str)
+    {
+        $this->fileCharset = mb_detect_encoding($str, "UTF-8, GBK") == 'UTF-8' ? 'UTF-8' : 'GBK';
+    }
+    /**
+     * @param $data
+     * @param $targetCharset
+     * @return array|false|mixed|string
+     * 转换字符集编码
+     */
+    function characet($data, $targetCharset)
+    {
+        if (!empty($data)) {
+            $fileType = $this->fileCharset;//当前编码
+            if (strcasecmp($fileType, $targetCharset) != 0) {
+                $data = mb_convert_encoding($data, $targetCharset, $fileType);
+            }
+        }
+        return $data;
+    }
 
     /**
      * @param $reqData
@@ -146,9 +189,9 @@ class GdkfPayClient
         if($checkRes){
             foreach ($checkRes as $key =>$vel){
                 throw new \Exception(config('gdkf_error.'.$vel),0);
-                return false;
             }
         }
+        self::setupCharsets($reqData['outOrderId']);
         return true;
     }
 
